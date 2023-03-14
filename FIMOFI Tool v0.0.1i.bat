@@ -1,7 +1,7 @@
 @ECHO off
 chcp 65001 >nul
 set name=FIMOFI Tools v0.0.1i
-title %name% ^| "%cd%"
+title %name%   "%cd%"
 :: Author  : Ramdany
 :: Name    : FIMOFI Tools v0.0.1i
 
