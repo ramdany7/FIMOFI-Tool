@@ -4,20 +4,19 @@ set name=FIMOFI Tools v0.0.1i
 title %name%   "%cd%"
 :: Author  : Ramdany
 :: Name    : FIMOFI Tools v0.0.1i
-
+:: Date  Created : 20 September 2022
+:: Last Edited   : 09 March 2023
 
 :Start
 call :varset
 call :Config-Load
 call :UpdateVar
-:::::::::::::::::::::::::::::::::::::
-rem if defined selected for %%X in (%selected%) do (echo %%~nxX)
 ::::::::::::::::::::::::::::::::::::
 if /i "%act%"=="Refresh"	set "xInput=1" &set "cdonly=false" &set "RefreshOpen=Index" &goto Refresh
-if /i "%xInput%"=="Refresh.Here"	cd /d %1 &set "cdonly=false" &set "RefreshOpen=Index" &goto Refresh
-if /i "%xInput%"=="RefreshNR.Here"	cd /d %1 &set "cdonly=false" &set "RefreshOpen=Index" &goto Refresh-NoRestart
-if /i "%xInput%"=="Refresh"			cd /d %1 &set "cdonly=true" &set "RefreshOpen=Select" &goto Refresh
-if /i "%xInput%"=="RefreshNR"		cd /d %1 &set "cdonly=true" &set "RefreshOpen=Select" &goto Refresh-NoRestart
+if /i "%xInput%"=="Refresh.Here"	cd /d %1 &set "cdonly=false" &set "RefreshOpen=Index" &goto FI-Refresh
+if /i "%xInput%"=="RefreshNR.Here"	cd /d %1 &set "cdonly=false" &set "RefreshOpen=Index" &goto FI-Refresh-NoRestart
+if /i "%xInput%"=="Refresh"			cd /d %1 &set "cdonly=true" &set "RefreshOpen=Select" &goto FI-Refresh
+if /i "%xInput%"=="RefreshNR"		cd /d %1 &set "cdonly=true" &set "RefreshOpen=Select" &goto FI-Refresh-NoRestart
 if defined xInput goto Input-Context
 
 :Intro                            
@@ -47,7 +46,7 @@ echo %_%%GG_%Keyword%G_%^|%GG_%Scan%G_%^|%GG_%Template%G_%^|%GG_%Generate%G_%^|%
 %GG_%OFF%G_%^|%GG_%Remove%G_%^|%GG_%O%G_%^|%GG_%S%G_%^|%GG_%CLS%G_%^|%GG_%R%G_%^|%GG_%HELP%G_%^|..
 :Options-CommandInput             
 echo %g_%--------------------------------------------------------------------------------------------------
-title %name% ^| "%cd%"
+title %name%   "%cd%"
 call :Config-Save
 call :UpdateVar
 call :Config-Load
@@ -60,17 +59,17 @@ if /i "%input%"=="cc"				start "" "%~f0" Refresh
 if /i "%input%"=="tag"			goto Keyword
 if /i "%input%"=="keyword"		goto Keyword
 if /i "%input%"=="gt"				goto Scan-GetDir
-if /i "%input%"=="scan"			set "recursive=no"		&goto Scan
-if /i "%input%"=="scan -s"		set "recursive=yes"		&goto Scan
-if /i "%input%"=="generate"		set "recursive=no"		&set "cdonly=false"	&set "input=Generate"	&goto Generate
-if /i "%input%"=="generate -s"	set "recursive=yes"		&set "cdonly=false"	&set "input=Generate"	&goto Generate
+if /i "%input%"=="scan"			set "recursive=no"		&goto FI-Scan
+if /i "%input%"=="scan -s"		set "recursive=yes"		&goto FI-Scan
+if /i "%input%"=="generate"		set "recursive=no"		&set "cdonly=false"	&set "input=Generate"	&goto FI-Generate
+if /i "%input%"=="generate -s"	set "recursive=yes"		&set "cdonly=false"	&set "input=Generate"	&goto FI-Generate
 if /i "%input%"=="Remove"		set "delete=ask"			&set "cdonly=false"	&goto Remove
-if /i "%input%"=="on"				set "refreshopen=index"	&goto Activate-Folder_Icon
-if /i "%input%"=="off"			set "refreshopen=index"	&goto Deactivate-Folder_Icon
+if /i "%input%"=="on"				set "refreshopen=index"	&goto FI-Activate
+if /i "%input%"=="off"			set "refreshopen=index"	&goto FI-Deactivate
 if /i "%input%"=="copy"			goto CopyFolderIcon
-if /i "%input%"=="refresh-f"		goto Refresh-NoRestart
+if /i "%input%"=="refresh-f"		goto FI-Refresh-NoRestart
 if /i "%input%"=="refresh"		echo %TAB%%cc_%Refreshing icon cache..%_%&set "act=Refresh" &start "" "%~f0" &goto options
-if /i "%input%"=="rf"				goto Refresh
+if /i "%input%"=="rf"				goto FI-Refresh
 if /i "%input%"=="template"		goto FI-Template 
 if /i "%input%"=="ft"				goto FI-Template
 if /i "%input%"=="Tes"			goto FI-Template-Test_Config
@@ -105,7 +104,7 @@ cls &echo. &echo. &echo.
 REM Selected Image
 if /i "%xInput%"=="IMG-Actions"						goto IMG-Actions
 if /i "%xInput%"=="IMG-Set.As.Folder.Icon"			%Dir1% 		&set input=%1 &set "RefreshOpen=Select" &goto DirectInput
-if /i "%xInput%"=="FIMOFI.IMG-FI.Choose.Template"	set img=%1	&goto FI-Template
+if /i "%xInput%"=="IMG-FI.Choose.Template"			set img=%1	&goto FI-Template
 if /i "%xInput%"=="IMG-Set.As.Cover"				set img=%1	&goto IMG-Set_as_MKV_cover
 REM Selected Dir	
 if /i "%xInput%"=="OpenHere"							%Dir% &call :Config-Save 			&set "xInput=" &cls &goto name
@@ -114,24 +113,24 @@ if /i "%xInput%"=="FI.Search.Folder.Icon"			goto FI-Search_Folder_Icon
 if /i "%xInput%"=="FI.Search.Folder.Icon.Here"	goto FI-Search_Folder_Icon
 if /i "%xInput%"=="Scan"								%Dir% &set "input=Scan" 			&set "cdonly=true" &goto Scan
 if /i "%xInput%"=="DefKey"							goto Keyword
-if /i "%xInput%"=="GenKey"							%Dir% &set "input=Generate"											&set "cdonly=true" &goto Generate
-if /i "%xInput%"=="GenJPG"							%Dir% &set "input=Generate"		&set "Target=*.jpg" 				&set "cdonly=true" &goto Generate
-if /i "%xInput%"=="GenPNG"							%Dir% &set "input=Generate"		&set "Target=*.png" 				&set "cdonly=true" &goto Generate
-if /i "%xInput%"=="GenPosterJPG"					%Dir% &set "input=Generate"		&set "Target=*Poster*.jpg" 		&set "cdonly=true" &goto Generate
-if /i "%xInput%"=="GenLandscapeJPG"					%Dir% &set "input=Generate"		&set "Target=*Landscape*.jpg"	&set "cdonly=true" &goto Generate
-if /i "%xInput%"=="ActivateFolderIcon"				%Dir% &set "RefreshOpen=Select"	&goto Activate-Folder_Icon
-if /i "%xInput%"=="DeactivateFolderIcon"			%Dir% &set "RefreshOpen=Select"	&goto Deactivate-Folder_Icon
-if /i "%xInput%"=="RemFolderIcon"					%Dir% &set "delete=confirm"		&set "cdonly=true"				&goto Remove
+if /i "%xInput%"=="GenKey"							%Dir% &set "input=Generate"											&set "cdonly=true" &goto FI-Generate
+if /i "%xInput%"=="GenJPG"							%Dir% &set "input=Generate"		&set "Target=*.jpg" 				&set "cdonly=true" &goto FI-Generate
+if /i "%xInput%"=="GenPNG"							%Dir% &set "input=Generate"		&set "Target=*.png" 				&set "cdonly=true" &goto FI-Generate
+if /i "%xInput%"=="GenPosterJPG"					%Dir% &set "input=Generate"		&set "Target=*Poster*.jpg" 		&set "cdonly=true" &goto FI-Generate
+if /i "%xInput%"=="GenLandscapeJPG"					%Dir% &set "input=Generate"		&set "Target=*Landscape*.jpg"	&set "cdonly=true" &goto FI-Generate
+if /i "%xInput%"=="ActivateFolderIcon"				%Dir% &set "RefreshOpen=Select"	&goto FI-Activate
+if /i "%xInput%"=="DeactivateFolderIcon"			%Dir% &set "RefreshOpen=Select"	&goto FI-Deactivate
+if /i "%xInput%"=="RemFolderIcon"					%Dir% &set "delete=confirm"		&set "cdonly=true"				&goto FI-Remove
 REM Background Dir	                         	
-if /i "%xInput%"=="Scan.Here"						%Dir% &set "input=Scan" 			&goto Scan
-if /i "%xInput%"=="GenKey.Here"						%Dir% &set "input=Generate"											&set "cdonly=false" &goto Generate
-if /i "%xInput%"=="GenJPG.Here"						%Dir% &set "input=Generate"		&set "Target=*.jpg" 				&set "cdonly=false" &goto Generate
-if /i "%xInput%"=="GenPNG.Here"						%Dir% &set "input=Generate"		&set "Target=*.png" 				&set "cdonly=false" &goto Generate
-if /i "%xInput%"=="GenPosterJPG.Here"				%Dir% &set "input=Generate"		&set "Target=*Poster*.jpg" 		&set "cdonly=false" &goto Generate
-if /i "%xInput%"=="GenLandscapeJPG.Here"			%Dir% &set "input=Generate"		&set "Target=*Landscape*.jpg"	&set "cdonly=false" &goto Generate
-if /i "%xInput%"=="ActivateFolderIcon.Here"		%Dir% &goto Activate-Folder_Icon
-if /i "%xInput%"=="DeactivateFolderIcon.Here"		%Dir% &goto Deactivate-Folder_Icon
-if /i "%xInput%"=="RemFolderIcon.Here"				%Dir% &set "delete=ask"			&set "cdonly=false"	&goto Remove
+if /i "%xInput%"=="Scan.Here"						%Dir% &set "input=Scan" 			&goto FI-Scan
+if /i "%xInput%"=="GenKey.Here"						%Dir% &set "input=Generate"											&set "cdonly=false" &goto FI-Generate
+if /i "%xInput%"=="GenJPG.Here"						%Dir% &set "input=Generate"		&set "Target=*.jpg" 				&set "cdonly=false" &goto FI-Generate
+if /i "%xInput%"=="GenPNG.Here"						%Dir% &set "input=Generate"		&set "Target=*.png" 				&set "cdonly=false" &goto FI-Generate
+if /i "%xInput%"=="GenPosterJPG.Here"				%Dir% &set "input=Generate"		&set "Target=*Poster*.jpg" 		&set "cdonly=false" &goto FI-Generate
+if /i "%xInput%"=="GenLandscapeJPG.Here"			%Dir% &set "input=Generate"		&set "Target=*Landscape*.jpg"	&set "cdonly=false" &goto FI-Generate
+if /i "%xInput%"=="ActivateFolderIcon.Here"		%Dir% &goto FI-Activate
+if /i "%xInput%"=="DeactivateFolderIcon.Here"		%Dir% &goto FI-Deactivate
+if /i "%xInput%"=="RemFolderIcon.Here"				%Dir% &set "delete=ask"			&set "cdonly=false"	&goto FI-Remove
 REM MKV Tools	
 REM Direct Selected MKV	
 if /i "%xInput%"=="MKV.Select"						%Dir1% &goto MKV-Select
@@ -581,16 +580,16 @@ if /i not "%DIchoice%"=="y" echo %TAB%%_%%g_%%i_%   Canceled   %-%&goto options
 if /i not "%xInput%"=="" cls &echo.&echo.&echo.&echo.&echo %TAB%%ESC%%yy_%📁 %foldername%%_%%ESC%
 :DirectInput-Generate-Confirm
 call :Config-Load
-call :Generate-Folder_Icon
+call :FI-Generate-Folder_Icon
 goto options
 
-:GetDir
+:FI-GetDir
 set "locationCheck=Start"
 REM Current dir only
 if /i "%cdonly%"=="true" (
 	FOR %%D in (.) do (
 		set "location=%%~fD" &set "folderpath=%%~dpD" &set "foldername=%%~nxD"
-		call :Scan-Desktop.ini
+		call :FI-Scan-Desktop.ini
 		EXIT /B
 	)
 )
@@ -598,17 +597,17 @@ REM All inside current dir including subfolders
 if /i "%Recursive%"=="yes" (
 	FOR /r %%D in (.) do (
 		set "location=%%D" &set "folderpath=%%~dpD" &set "foldername=%%~fD"
-		call :Scan-Desktop.ini
+		call :FI-Scan-Desktop.ini
 	)
 	EXIT /B
 )
 REM All inside current dir only
 FOR /f "tokens=*" %%D in ('dir /b /a:d') do (
 	set "location=%%~fD" &set "folderpath=%%~dpD" &set "foldername=%%~nxD"
-	call :Scan-Desktop.ini
+	call :FI-Scan-Desktop.ini
 )
 EXIT /B
-:Scan
+:FI-Scan
 set "yy_result=0"
 set "y_result=0"
 set "g_result=0"
@@ -620,7 +619,7 @@ echo %TAB%%TAB%%cc_%%i_%  Scanning folder.. %-%
 Echo %TAB%Target    : %target%
 echo %TAB%Directory :%ESC%%cd%%ESC%
 echo %TAB%%w_%==============================================================================%_%
-call :GetDir
+call :FI-GetDir
 echo %TAB%%w_%==============================================================================%_%
 echo.
 set /a "result=%yy_result%+%y_result%+%g_result%+%r_result%"
@@ -636,7 +635,7 @@ echo   %g_%Note: jika ada lebih dari satu file "%target%" didalam folder, maka y
 echo   sebagai folder icon adalah file "%target%" teratas didalam folder.
 set "result=0" &goto options
 
-:Scan-Desktop.ini
+:FI-Scan-Desktop.ini
 	if "%locationCheck%"=="%location%" EXIT /B
 :: Hati-hati, jangan selalu gunakan (), gunakan ESCAPE disetiap variable.
 PUSHD "%location%"
@@ -646,7 +645,7 @@ PUSHD "%location%"
 			if "%newline%"=="yes" echo.
 			echo %TAB%%ESC%%yy_%📁 %foldername%%ESC%
 			set /a YY_result+=1 
-			call :Scan-Find_Target
+			call :FI-Scan-Find_Target
 			POPD&EXIT /B
 		)
 		echo %TAB%%ESC%%g_%📁 %foldername%%ESC%
@@ -664,7 +663,7 @@ PUSHD "%location%"
 			attrib -s -h "desktop.ini" &attrib |EXIT /B
 			copy "desktop.ini" "desktop.shellinfo.ini" >nul||echo %TAB%     %r_%%i_% copy fail! %-%
 			attrib +s +h "desktop.ini"
-			call :Scan-Find_Target
+			call :FI-Scan-Find_Target
 			POPD&EXIT /B
 		)
 		echo %TAB%%ESC%%g_%📁 %foldername%%ESC%
@@ -680,7 +679,7 @@ PUSHD "%location%"
 			echo %TAB%%ESC%Folder icon:%r_%%iconresource%%ESC%%r_%%i_%Not Found!%-%
 			echo %TAB%%g_% This folder already have a Folder icon, but icon is missing.%_%
 			echo %TAB%%g_% Icon will be repalced by selected image.%_%
-			call :Scan-Find_Target
+			call :FI-Scan-Find_Target
 			set "iconresource="
 			POPD&EXIT /B
 		)
@@ -693,28 +692,28 @@ PUSHD "%location%"
 	if exist "desktop.ini" if exist "%iconresource%" echo %TAB%%ESC%%y_%📁 %foldername%%ESC% &set /a Y_result+=1
 	set "newline=yes"
 	set "iconresource="
-	if /i "%xinput%"=="Create" call :Scan-Find_Target
+	if /i "%xinput%"=="Create" call :FI-Scan-Find_Target
 POPD&EXIT /B
 rem if exist "desktop.shellinfo.ini" >desktop.ini type desktop.shellinfo.ini &>>desktop.ini echo Tes &>>desktop.ini echo Satu &>>desktop.ini echo dua &echo. &EXIT /B
 
-:Scan-Find_Target
+:FI-Scan-Find_Target
 for %%F in (%target%) do (
 	set "newline=no"
 	set "Filename=%%~nxF"
 	set "FilePath=%%~dpF"
-	if /i "%input%"=="Scan" call :Scan-Display_Result
-	if /i "%input%"=="Generate" call :Generate-Folder_Icon
+	if /i "%input%"=="Scan" call :FI-Scan-Display_Result
+	if /i "%input%"=="Generate" call :FI-Generate-Folder_Icon
 )
 echo. &EXIT /B
 
-:Scan-Display_Result
+:FI-Scan-Display_Result
 if "%Selected%"=="" (
 	set "Selected=%Filename%" 
 	echo %TAB%%ESC%%_%Selected Image:%c_%%Filename%%ESC%
 )
 EXIT /B
 
-:Generate
+:FI-Generate
 set "yy_result=0"
 set "y_result=0"
 set "g_result=0"
@@ -729,7 +728,7 @@ if exist "%FItemplate%" for %%T in ("%FItemplate%") do ^
 Echo %TAB%Template  : %w_%%%~nT%_% 
 echo %TAB%Directory :%ESC%%cd%%ESC%
 echo %TAB%%cc_%==============================================================================%_%
-call :GetDir
+call :FI-GetDir
 echo %TAB%%cc_%==============================================================================%_%
 echo.
 set /a "result=%yy_result%+%y_result%+%g_result%+%r_result%"
@@ -767,7 +766,7 @@ ie4uinit.exe -show
 REM if /i "%cdonly%"=="true" (set "RefreshOpen=Select" &call :Config-Save) else (set "RefreshOpen=Index" &call :Config-Save)
 goto options
 
-:Generate-Folder_Icon
+:FI-Generate-Folder_Icon
 @echo off
 if "%Selected%"=="" (
 	if "%xInput%"=="" (
@@ -814,7 +813,7 @@ if "%Selected%"=="" (
 )
 EXIT /B
 
-:Generate-Get_Template
+:FI-Generate-Get_Template
 for /f "usebackq tokens=1,2 delims==<>" %%C in ("%~dp0config.ini") do set %%C=%%D
 if not exist "%FItemplate%" (
 	echo.
@@ -887,34 +886,37 @@ call :UpdateVar
 call :Config-Load
 set inputfile="%~dp0Template\img\test.jpg"
 set outputfile="%~dp0Template\img\test.ico"
-if /i "%xInput%"=="ChoTemplate.Img" set inputfile=%img%
+if exist %outputFile% del /q %outputFile%
+if /i "%xInput%"=="IMG-FI.Choose.Template" set inputfile=%img%
 echo %i_%%g_%  Testing Config %-%
 echo %g_%Test img: %inputfile%%r_%
 PUSHD "%~dp0"
 Call "%FItemplate%"
 POPD
 IF %ERRORLEVEL% NEQ 0 echo   %r_%%i_%   error ^(%ERRORLEVEL%^)   %-%
-IF %ERRORLEVEL% EQU 0 echo %g_%Done! &explorer.exe "%outputFile%"
+IF exist %outputFile% echo %g_%Done! &explorer.exe %outputFile%
 goto options
 
 :FI-Search_Folder_Icon
 if /i "%xInput%"=="FI.Search.Folder.Icon" (
 	For %%I in (%1) do (Start "" "https://google.com/search?q=%%~nxI folder icon&tbm=isch&tbs=ic:trans")
+	exit
 )
-echo %TAB%%TAB%%TAB%%TAB%%TAB%%TAB%%g_%    Search folder icon  on google image search, Just type
-echo %TAB%%TAB%%TAB%%TAB%%TAB%%TAB%%g_% the keyword and then hit [Enter], you will be redirected 
-echo %TAB%%TAB%%TAB%%TAB%%TAB%%TAB%%g_% to google search image.%_%
+echo.&echo.
+echo                     %g_%    Search folder icon  on google image search, Just type
+echo                     %g_% the keyword and then hit [Enter], you will be redirected 
+echo                     %g_% to google search image.%_%
 echo.&echo.&echo.&echo.
-echo %TAB%%TAB%%TAB%%TAB%%TAB%%TAB%%TAB%%TAB%%TAB%%TAB%%TAB%%TAB% %i_%%w_% SEARCH FOLDER ICON %_%
+echo                                       %i_%%w_% SEARCH FOLDER ICON %_%
 echo.
 set "SrcInput= "
 set /p "SrcInput=%_%%w_%                                     %_%%w_%"
-if /i "%SrcInput%"==" " cls &goto FI-Search_Folder_Icon
+if /i "%SrcInput%"==" " cls &echo.&echo.&echo.&goto FI-Search_Folder_Icon
 Start "" "https://google.com/search?q=%SrcInput% folder icon&tbm=isch&tbs=ic:trans"
 cls
 Goto Options
 
-:Keyword                  
+:FI-Keyword                  
 echo %TAB%%g_%Current keyword:%ESC%%c_%%FItarget%%ESC%%_%
 echo %TAB%%g_%This keyword will be use to search file name to generate folder icon.%_%
 set "newFItarget=*"
@@ -948,9 +950,9 @@ echo.
 echo %TAB%%_%%i_%  Invalid selection.  %-%
 echo.
 goto options
-:Keyword-Extension
+:FI-Keyword-Extension
 set /p "FIextension=%-%%-%%-%%w_%Define file extension:%c_%"
-:Keyword-Selected
+:FI-Keyword-Selected
 call :Config-Save &call :UpdateVar
 if "%xInput%"=="DefKey" (
 	cls &echo.&echo.&echo.&echo.&echo.&echo.&echo.&echo.&echo.&echo.&echo.
@@ -960,7 +962,7 @@ if "%xInput%"=="DefKey" (
 )
 goto Status
 
-:Activate-Folder_Icon
+:FI-Activate
 echo %TAB%%cc_%  Activating folder Icon.. %_%
 if "%RefreshOpen%"=="Select" (
 	FOR %%D in (.) do (
@@ -976,7 +978,7 @@ if "%RefreshOpen%"=="Select" (
 echo.
 echo %TAB%%cc_% %i_%   Done!   %-%
 goto options
-:Deactivate-Folder_Icon
+:FI-Deactivate
 echo %TAB%%cc_%    Deactivating folder Icon.. %_%
 if "%RefreshOpen%"=="Select" (
 	FOR %%D in (.) do (
@@ -1006,17 +1008,16 @@ ROBOCOPY /s "%cd%" "%cd%\- FIMOFI Tool\- Copied Folders" Desktop.ini foldericon.
 explorer "%cd%\- FIMOFI Tool"
 goto options
 
-:Remove
+:FI-Remove
 @echo off
 set "result=0"
 set "delresult=0"
-IF /I "%DELETE%"=="CONFIRM" goto Remove-Confirm
-
+IF /I "%DELETE%"=="CONFIRM" goto FI-Remove-Confirm
 echo %TAB%%r_%   %i_%  Remove Folder Icon  %-%
 echo.
 echo %TAB%%w_%Directory:%ESC%%w_%%cd%%ESC%
 echo %TAB%%w_%==============================================================================%_%
-call :Remove-Get
+call :FI-Remove-Get
 echo %TAB%%w_%==============================================================================%_%
 IF /i %result% LSS 1 if defined xInput cls
 IF /i %result% LSS 1 echo.&echo.&echo. &echo %_%%TAB%^(%r_%%result%%_%%_%^) Couldn't find any folder icon. &goto options
@@ -1027,19 +1028,19 @@ echo %TAB% inside folder will be deleted. Insert command %gg_%Y%g_% to confirm.%
 set cho=kosong
 set /p "delete=%-%%-%%-%%-%%g_%Options: %gn_%Y%_%/%gn_%N%_% %gn_%> " 
 if /i "%delete%"=="Y" if defined xInput cls
-if /i "%delete%"=="Y" set "delete=confirm" &goto Remove
+if /i "%delete%"=="Y" set "delete=confirm" &goto FI-Remove
 echo %_%%TAB%%I_%     Canceled     %_% &goto options
 if /i "%cdonly%"=="false" echo.pause >nul
 goto options
 
-:Remove-Confirm
+:FI-Remove-Confirm
 echo.&echo.&echo.&echo.
 echo %TAB%%r_%   %i_%  Removing Folder Icon..  %-%
 echo.
 if /i not "%cdonly%"=="true" echo %TAB%%w_%Directory:%ESC%%w_%%cd%%ESC%
 if /i not "%cdonly%"=="true" echo %TAB%%w_%==============================================================================%_%
 if /i not "%cdonly%"=="true" echo.
-call :Remove-Get
+call :FI-Remove-Get
 if /i not "%cdonly%"=="true" echo %TAB%%w_%==============================================================================%_%
 IF /i %result% LSS 1 if defined xInput cls
 IF /i %result% LSS 1 echo.&echo.&echo. &echo %_%%TAB%^(%r_%%result%%_%%_%^) Couldn't find any folder icon. &goto options
@@ -1047,7 +1048,7 @@ if %delresult% GTR 0 echo. &echo %TAB% ^(%r_%%delresult%%_%^) Folder icon delete
 rem if /i not "%cdonly%"=="true" echo. &echo %TAB%%g_%Press any key to close this window. &pause >nul &exit
 goto options
 
-:Remove-Get
+:FI-Remove-Get
 if /i "%cdonly%"=="true" (
 	FOR %%D in (.) do (
 	set "location=%%~fD" &set "folderpath=%%~dpD" &set "foldername=%%~nxD"
@@ -1055,7 +1056,7 @@ if /i "%cdonly%"=="true" (
 			if exist "desktop.ini" (
 				FOR /f "usebackq tokens=1,2 delims==," %%C in ("desktop.ini") do (
 					set "%%C=%%D"
-					if /i "%%C"=="iconresource" call :Remove-Act
+					if /i "%%C"=="iconresource" call :FI-Remove-Act
 				)
 			)
 		POPD
@@ -1068,14 +1069,14 @@ FOR /f "tokens=*" %%D in ('dir /b /a:d') do (
 		if exist "desktop.ini" (
 			FOR /f "usebackq tokens=1,2 delims==," %%C in ("desktop.ini") do (
 				set "%%C=%%D"
-				if /i "%%C"=="iconresource" call :Remove-Act
+				if /i "%%C"=="iconresource" call :FI-Remove-Act
 			)
 		)
 	POPD
 )
 EXIT /B
 
-:Remove-Act
+:FI-Remove-Act
 if not "%delete%"=="confirm" (
 	if exist "%iconresource%" (
 		set /a result+=1
@@ -1110,7 +1111,7 @@ echo. &echo   %b_%MKVToolNix%_% %w_%belum terinstall^%c_%?%_%
 echo   %g_%pastikan MKVToolNix sudah terinstall pada salah satu path di atas.%_%
 goto options
 
-:ScanFunction                     
+:FI-ScanFunction                     
 %PrintCurrentdir%
 %scanDetect% (%do%)
 FOR /d /r "%cd%" %%a in (*) do (
@@ -1127,10 +1128,10 @@ set "MKVfile=%MKVfile: =*%"
 call :Config-Save &call :UpdateVar 
 echo    %_%Target pencarian file MKV: %printTagMKV% &goto Options
 
-:ScanMkv                          
+:FI-ScanMkv                          
 echo      %cc_%Scanning MKV..%_%
 set "ext=.mkv"
-call :scanFunction
+call :FI-ScanFunction
 IF /i %result% LSS 1 (echo   ^(file dengan keyword %printTagMKV% tidak ditemukan.^) &goto options)
 echo. &echo    %w_%^(%c_%%result%%_%%w_%^) file ditemukan.%_% &echo. &goto options
 
@@ -1190,7 +1191,7 @@ set "Prioritas5=%setcover%"
 REM    ::::::::::::::::::::::::::::::::::::::::::::::::::::
 REM   :::::::::::::::   LAIN NYA..  ::::::::::::::::::::::
 REM  ::::::::::::::::::::::::::::::::::::::::::::::::::::
-:Refresh
+:FI-Refresh
 rem if defined xInput (
 rem 	echo %TAB%%TAB%%_%%r_%Restart File Explorer^?%-% 
 rem 	echo   %ast%%g_%Untuk memaksa windows melakukan update icon dan  thumbnail  cache%_%
@@ -1219,11 +1220,11 @@ if "%startexplorer%"=="fail" (
 	)
 if /i "%RefreshOpen%"=="Select" (explorer.exe /select, "%cd%") else explorer.exe "%cd%"
 echo %TAB%%TAB%%cc_%%i_%    Done!   %-%
-call :Refresh-NoRestart
+call :FI-Refresh-NoRestart
 if /i "%act%"=="Refresh" exit /b
 %p2% &%p2% &goto options
 
-:Refresh-NoRestart                
+:FI-Refresh-NoRestart                
 @echo off
 if /i not "%xInput%"=="" echo.
 mode con:cols=50 lines=9
@@ -1389,7 +1390,7 @@ call :UpdateVar
 EXIT /B
 
 :UpdateVar                      
-title %name% ^| "%cd%"
+title %name%    "%cd%"
 set "result=0"
 set "target=*%FItarget%*%FIextension%"
 for %%T in ("%FItemplate%") do set TemplateName=%%~nT

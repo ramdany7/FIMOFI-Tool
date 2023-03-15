@@ -109,7 +109,7 @@ set RegExShell=%HKEY%_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Ex
 	echo "MUIVerb"="Coose Template"
 	echo "Icon"="shell32.dll,-16825"
 	echo [%RegExShell%\FIMOFI.IMG-FI.Choose.Template\command]
-	echo @="%cmd% set \"xInput=FIMOFI.IMG-FI.Choose.Template\" &call %fimofi% \"%%V\""	
+	echo @="%cmd% set \"xInput=IMG-FI.Choose.Template\" &call %fimofi% \"%%V\""	
 
 	:REG-IMAGE-Set.as.Cover
 	echo [%RegExShell%\FIMOFI.IMG-Set.As.Cover]
